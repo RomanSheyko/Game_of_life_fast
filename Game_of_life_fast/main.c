@@ -112,15 +112,14 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
 {
     int i, j, k, scale, up_row, down_row;
     uchar sum, added_bits_u, added_bits_c, added_bits_l, current_bit;
-    unsigned short int r = 0xe994, upper_row, center_row, lower_row;
+    unsigned short int r = 0xe994;
+    register unsigned short upper_row, center_row, lower_row;
     for(i = 0; i < CELL_ROWS; i++)
     {
         for(j = 0; j < _CALCULATED_HEX_COLUMNS; j++)
         {
-            up_row = i - 1;
-            if(i == 0) up_row = CELL_ROWS - 1;
-            down_row = i + 1;
-            if(i == CELL_ROWS - 1) down_row = 0;
+            up_row = (i == 0) ? (CELL_ROWS - 1) : (i-1);
+            down_row = (i == CELL_ROWS - 1) ? 0 : (i+1);
             upper_row = prev_generation[up_row*_CALCULATED_HEX_COLUMNS + j];
             center_row = prev_generation[i*_CALCULATED_HEX_COLUMNS + j];
             lower_row = prev_generation[down_row*_CALCULATED_HEX_COLUMNS + j];
@@ -152,7 +151,7 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
                     set_alife(current_generation, scale, i);
                 else set_dead(current_generation, scale, i);
             }
-            if(j != _CALCULATED_HEX_COLUMNS-1)
+            if(j != _CALCULATED_HEX_COLUMNS - 1)
             {
                 added_bits_u = prev_generation[up_row*_CALCULATED_HEX_COLUMNS + j+1]&1;
                 added_bits_c = prev_generation[i*_CALCULATED_HEX_COLUMNS + j+1]&1;
