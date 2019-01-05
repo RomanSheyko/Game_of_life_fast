@@ -136,8 +136,8 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
             current_bit = center_row&1;
             sum = ((r >> ((upper_row & 3) << 1)) & 3) + added_bits_u + ((r >> ((center_row & 2) << 1)) & 3) + added_bits_c + ((r >> ((lower_row & 3) << 1)) & 3) + added_bits_l;
             if(sum == 3 || (current_bit == 1 && sum == 2))
-                set_alife(current_generation, j*16, i);
-            else set_dead(current_generation, j*16, i);
+                set_alife(current_generation, j<<4, i);
+            else set_dead(current_generation, j<<4, i);
             for(k = 1; k < 15; k++)
             {
                 current_bit = (center_row&2) >> 1;
@@ -146,7 +146,7 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
                 center_row >>= 1;
                 lower_row >>= 1;
                 
-                scale = j*16+k;
+                scale = (j<<4)+k;
                 if(sum == 3 || (current_bit == 1 && sum == 2))
                     set_alife(current_generation, scale, i);
                 else set_dead(current_generation, scale, i);
@@ -164,8 +164,8 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
             current_bit = center_row>>1;
             sum = ((r >> ((upper_row & 3) << 1)) & 3) + added_bits_u + ((r >> ((center_row & 1) << 1)) & 3) + added_bits_c + ((r >> ((lower_row & 3) << 1)) & 3) + added_bits_l;
             if(sum == 3 || (current_bit == 1 && sum == 2))
-                set_alife(current_generation, j*16+15, i);
-            else set_dead(current_generation, j*16+15, i);
+                set_alife(current_generation, (j<<4)+15, i);
+            else set_dead(current_generation, (j<<4)+15, i);
         }
     }
 }
