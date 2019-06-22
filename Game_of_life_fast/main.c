@@ -2,8 +2,8 @@
 //  main.c
 //  Game_of_life_fast
 //
-//  Created by Роман on 26/12/2018.
-//  Copyright © 2018 Roman. All rights reserved.
+//  Created by Роман on 26/12/2019.
+//  Copyright © 2019 Roman. All rights reserved.
 //
 
 #include <stdio.h>
@@ -11,8 +11,9 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 
-#define CELL_ROWS 400
-#define CELL_COLUMNS 400
+#define CELL_ROWS 640
+#define CELL_COLUMNS 640
+#define PROPABILITY_OF_LIFE 1
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
@@ -55,6 +56,7 @@ uchar check(uchar *area, int i, int j)
     return isAlife(area, (uint)i, (uint)j);
 }
 
+/*
 void set_all_dead_sse(uchar* area)
 {
     int i;
@@ -74,6 +76,7 @@ void set_all_dead_sse(uchar* area)
             "add rsi, 16");
     }
 }
+ */
 
 void set_all_dead(uchar* area)
 {
@@ -110,7 +113,9 @@ void generation(uchar *prev_generation, uchar *current_generation)
 
 void generation_v_2(ushort *prev_generation, uchar *current_generation)
 {
+    srand(time(NULL));
     int i, j, k, scale, up_row, down_row;
+    char prop;
     uchar sum, added_bits_u, added_bits_c, added_bits_l, current_bit;
     unsigned short int r = 0xe994;
     register unsigned short upper_row, center_row, lower_row;
@@ -140,6 +145,7 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
             else set_dead(current_generation, j<<4, i);
             for(k = 1; k < 15; k++)
             {
+                prop = rand()%100;
                 current_bit = (center_row&2) >> 1;
                 sum = ((r >> ((upper_row & 7) << 1)) & 3) + ((r >> ((center_row & 5) << 1)) & 3) + ((r >> ((lower_row & 7) << 1)) & 3);
                 upper_row >>= 1;
@@ -147,7 +153,7 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
                 lower_row >>= 1;
                 
                 scale = (j<<4)+k;
-                if(sum == 3 || (current_bit == 1 && sum == 2))
+                if((sum == 3 || (current_bit == 1 && sum == 2)) && (prop < PROPABILITY_OF_LIFE*100))
                     set_alife(current_generation, scale, i);
                 else set_dead(current_generation, scale, i);
             }
@@ -163,7 +169,7 @@ void generation_v_2(ushort *prev_generation, uchar *current_generation)
             }
             current_bit = center_row>>1;
             sum = ((r >> ((upper_row & 3) << 1)) & 3) + added_bits_u + ((r >> ((center_row & 1) << 1)) & 3) + added_bits_c + ((r >> ((lower_row & 3) << 1)) & 3) + added_bits_l;
-            if(sum == 3 || (current_bit == 1 && sum == 2))
+            if((sum == 3 || (current_bit == 1 && sum == 2)) && (prop < PROPABILITY_OF_LIFE*100))
                 set_alife(current_generation, (j<<4)+15, i);
             else set_dead(current_generation, (j<<4)+15, i);
         }
@@ -175,8 +181,8 @@ int main(int argc, const char * argv[]) {
     uchar previous_generation[_ALLOCATED_MEMORY_IN_USE];
     uchar *cur_gen = cell_area;
     uchar *next_gen = previous_generation;
-    set_all_dead_sse(cell_area);
-    set_all_dead_sse(previous_generation);
+    set_all_dead(cell_area);
+    set_all_dead(previous_generation);
     /*
     set_alife(cell_area, 390, 303);
     set_alife(cell_area, 391, 303);
@@ -222,9 +228,13 @@ int main(int argc, const char * argv[]) {
     SDL_RenderPresent(renderer);
     Uint32 start;
     char running = 1;
+    clock_t begin;
+    clock_t end;
+    double time_spent;
     while(running != 0)
     {
         start = SDL_GetTicks();
+        begin = clock();
         SDL_Event e;
         while(SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -248,6 +258,10 @@ int main(int argc, const char * argv[]) {
                 }
             }
         SDL_RenderPresent(renderer);
+        
+        end = clock();
+        time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        printf("%f\n", 1/time_spent);
         
         if(1000/FRAMES_PER_SECOND > SDL_GetTicks() - start)
             SDL_Delay(1000/FRAMES_PER_SECOND - (SDL_GetTicks() - start));
