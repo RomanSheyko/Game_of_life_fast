@@ -113,9 +113,9 @@ void generation(uchar *prev_generation, uchar *current_generation)
 
 void generation_v_2(ushort *prev_generation, uchar *current_generation)
 {
-    srand(time(NULL));
+    srand((uint)time(NULL));
     int i, j, k, scale, up_row, down_row;
-    char prop;
+    char prop = rand()%100;
     uchar sum, added_bits_u, added_bits_c, added_bits_l, current_bit;
     unsigned short int r = 0xe994;
     register unsigned short upper_row, center_row, lower_row;
@@ -214,7 +214,7 @@ int main(int argc, const char * argv[]) {
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     const int FRAMES_PER_SECOND = 30;
     int i, j;
-    srand(time(NULL));
+    srand((uint)time(NULL));
     for(i = 0; i < _ALLOCATED_MEMORY_IN_USE; i++)
         cur_gen[i] = rand()%255;
     for(i = 0; i < CELL_ROWS; i++)
@@ -241,7 +241,7 @@ int main(int argc, const char * argv[]) {
                 running = 0;
             }
         }
-        generation_v_2(cur_gen, next_gen);
+        generation_v_2((unsigned short*)cur_gen, next_gen);
         uchar *tmp = cur_gen;
         cur_gen = next_gen;
         next_gen = tmp;
